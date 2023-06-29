@@ -1,0 +1,67 @@
+{% extends 'teacher_layout.html' %}
+{% load static %}
+
+{% block content %}
+    <body>
+        <div class="container">
+            <div class="form-group">
+                <label for="exampleInputEmail1">旧密码</label>
+                <input type="password" class="form-control" id="now_pwd" placeholder="旧密码">
+            </div>
+            <div id="fd1"></div>
+            <div class="form-group">
+                <label for="exampleInputPassword1">新密码</label>
+                <input type="password" class="form-control" id="new_pwd1" placeholder="新密码">
+            </div>
+            <div class="form-group">
+                <label for="exampleInputPassword1">确认新密码</label>
+                <input type="password" class="form-control" id="new_pwd2" placeholder="确认新密码">
+            </div>
+            <div id="fd2"></div>
+            <button type="submit" id="modify_pwd_btn" class="btn btn-default">Submit</button>
+        </div>
+    </body>
+{% endblock %}
+
+{% block js %}
+    <script src="{% static 'js/echarts.js' %}"></script>
+    <script src="{% static 'js/jquery-3.6.0.min.js' %}"></script>
+    <script type="text/javascript">
+
+        $("#modify_pwd_btn").click(function (){
+            $("#fd2").html('');
+            $("#fd1").html('');
+            let now_pwd = document.getElementById("now_pwd");
+            let new_pwd1 = document.getElementById("new_pwd1");
+            let new_pwd2 = document.getElementById("new_pwd2");
+            if(new_pwd1.value !== new_pwd2.value){
+                let $failed_dialog2 = $(`<div class="alert alert-danger alert-dismissible" id="failed_dialog2" role="alert">
+                                              <button type="button" class="close" data-dismiss="alert" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+                                              <strong>您输入的两次新密码不一样</strong>
+                                          </div>`)
+                $("#fd2").append($failed_dialog2);
+            } else {
+                $.ajax({
+                    url: "/modify/password/",
+                    type: "get",
+                    data: {
+                        now_password: now_pwd.value,
+                        new_password: new_pwd1.value,
+                    },
+                    dataType: "JSON",
+                    success: function (res){
+                        if(res.status){
+                            window.location.href = '/login';
+                        } else {
+                            let $failed_dialog1 = $(`<div class="alert alert-danger alert-dismissible" id="failed_dialog1" role="alert">
+                                                          <button type="button" class="close" data-dismiss="alert" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+                                                          <strong>旧密码输入错误</strong>
+                                                    </div>`);
+                            $("#fd1").append($failed_dialog1);
+                        }
+                    }
+                })
+            }
+        })
+    </script>
+{% endblock %}

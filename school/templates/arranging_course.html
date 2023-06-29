@@ -1,0 +1,97 @@
+{% extends 'manager_layout.html' %}
+{% load static %}
+
+{% block content %}
+    <style>
+    input {
+        margin-top: 15px;
+    }
+    label {
+        font-size: 20px;
+    }
+    </style>
+    <div class="container">
+        <form name="submit" method="post" enctype="multipart/form-data" id="submit_file">
+            {% csrf_token %}
+            <label>请选择软件必修:</label>
+            <input type="file" id="soft" name="1" accept=".csv" style="display: inline;">
+            <div id="fd1"></div>
+            <label>请选择计算机必修:</label>
+            <input type="file" id="comp" name="2" accept=".csv" style="display: inline;">
+            <div id="fd2"></div>
+            <label>请选择物联网必修:</label>
+            <input type="file" id="web" name="3" accept=".csv" style="display: inline;">
+            <div id="fd3"></div>
+            <label>请选择专业选修:</label>
+            <input type="file" id="sele" name="4" accept=".csv" style="display: inline;">
+            <div id="fd4"></div>
+            <label>请选择专业班级信息:</label>
+            <input type="file" id="classes" name="5" accept=".csv" style="display: inline;">
+            <div id="fd5"></div>
+            <label>请选择其他院排好的课:</label>
+            <input type="file" id="other" name="6" accept=".csv" style="display: inline;">
+            <div id="fd6"></div>
+            <label>请选择同时间片课程:</label>
+            <input type="file" id="sametime" name="7" accept=".csv" style="display: inline;">
+            <div id="fd7"></div>
+            <label>请选择带实验:</label>
+            <input type="file" id="exp" name="8" accept=".csv" style="display: inline;">
+            <div id="fd8"></div>
+            <label>请选择排好的课的文件:</label>
+            <input type="file" id="success" name="9" accept=".csv" style="display: inline;">
+            <div id="fd9"></div>
+            <label>请选择教室信息:</label>
+            <input type="file" id="room" name="10" accept=".csv" style="display: inline;">
+            <div id="fd10"></div>
+            <label>请选择老师信息:</label>
+            <input type="file" id="teacher" name="11" accept=".csv" style="display: inline;">
+            <div id="fd11"></div>
+            <label>请选择教师时间表:</label>
+            <input type="file" id="teacher_time" name="12" accept=".csv" style="display: inline;">
+            <div id="fd12"></div>
+            <label>请选择教师需求上课时间表:</label>
+            <input type="file" id="teahcer_need" name="13" accept=".csv" style="display: inline;">
+            <div id="fd13"></div>
+        </form>
+        <div>
+            <button type="button" id="sub" class="btn btn-success" style="width: 170px;height: 40px;margin-top: 30px;">
+                <span class="glyphicon glyphicon-open" aria-hidden="true"></span>
+                上传文件，开始排课
+            </button>
+        </div>
+    </div>
+{% endblock %}
+
+{% block js %}
+
+    <script type="text/javascript">
+        $('#sub').click(function(){
+            for(let i=1;i<=13;i++){
+                let name="#fd"+i;
+                $(name).html('');
+            }
+            let ids=['soft','comp','web','sele','classes','other','sametime','exp','success','room','teacher','teacher_time','teahcer_need'];
+            let file_names=['软件必修.csv','计算机必修.csv','物联网必修.csv','专业选修.csv','专业班级信息.csv', '其他院排好的课.csv',
+                '同时间片课程.csv','带实验.csv','排好的课的文件.csv','教室信息.csv','老师信息.csv','教师时间表.csv','教师需求上课时间表.csv']
+            let success=true;
+            for(let i=1;i<=13;i++){
+                let name=ids[i-1];
+                if(document.getElementById(name).files[0] !== undefined && document.getElementById(name).files[0].name === file_names[i-1]) {
+                }else{
+                    let $failed_dialog = $(`<div class="alert alert-danger alert-dismissible" id="failed_dialog" role="alert" style="width: 800px;height: 52px;margin-left: 2%;">
+                                          <button type="button" class="close" data-dismiss="alert" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+                                          <strong>未输入文件或输入文件名与要求不符。</strong>
+                                     </div>`)
+                    let fd="#fd"+i;
+                    $(fd).append($failed_dialog);
+                    success=false;
+                    break;
+                }
+            }
+            if(success){
+                let t=document.getElementById('submit_file');
+                t.submit();
+            }
+        });
+    </script>
+{% endblock %}

@@ -1,0 +1,155 @@
+{% extends 'manager_layout.html' %}
+
+{% block content %}
+
+    <div class="container">
+        <div style="margin-bottom: 10px">
+            {#            <a class="btn btn-success" href="/course/add/">#}
+            {#                <span class="glyphicon glyphicon-plus-sign" aria-hidden="true"></span>#}
+            {#                添加课程安排#}
+            {#            </a>#}
+            {% if is_free == 1 %}
+                <a class="btn btn-success" href="/scheduling/course/">
+                    <span class="glyphicon glyphicon-open" aria-hidden="true"></span>
+                    排课
+                </a>
+            {% else %}
+                <style>
+                    #aaa:hover {
+                        cursor: not-allowed;
+                    }
+                </style>
+                <a id="aaa" class="btn" href="#" style="background-color: lightgray;color: grey;">
+                    <span class="glyphicon glyphicon-open" aria-hidden="true"></span>
+                    排课
+                </a>
+            {% endif %}
+
+
+            <div style="float: right;width: 300px;">
+                <form method="get">
+                    <div class="input-group">
+                        <input type="text" name="value" class="form-control" placeholder="请输入课程名 / 教师名..."
+                               value={{ value }}>
+                        <span class="input-group-btn">
+                        <button class="btn btn-default" type="submit">
+                            <span class="glyphicon glyphicon-search" aria-hidden="true"></span>
+                        </button>
+                      </span>
+                    </div>
+                </form>
+            </div>
+
+        </div>
+
+        <div class="panel panel-default">
+            <!-- Default panel contents -->
+            <div class="panel-heading">
+                <span class="glyphicon glyphicon-th-list" aria-hidden="true"></span>
+                课程安排列表
+            </div>
+            <!-- Table -->
+            <table class="table table-striped table-bordered">
+                <thead>
+                <tr>
+                    <th>课程名</th>
+                    <th>上课教师</th>
+                    <th>上课地点</th>
+                    <th>开始周次</th>
+                    <th>结束周次</th>
+                    <th>上课星期</th>
+                    <th>上课节次</th>
+                    <th>操作</th>
+                </tr>
+                </thead>
+                <tbody>
+                {% for course in courses %}
+                    <tr>
+                        <th>{{ course.teaching_program__course__course_name }}</th>
+                        <td>{{ course.teaching_program__teacher__name }}</td>
+                        <td>{{ course.room__room_name }}</td>
+                        {% if course.type == 1 %}
+                            <td>{{ course.teaching_program__the_start_week }}</td>
+                            <td>{{ course.teaching_program__the_end_week }}</td>
+                        {% else %}
+                            <td>{{ course.teaching_program__exp_start_week }}</td>
+                            <td>{{ course.teaching_program__exp_end_week }}</td>
+                        {% endif %}
+
+                        <td>{{ course.time__day }}</td>
+                        <td>{{ course.time__lesson }}</td>
+                        <td>
+                            {% if course.type == 1 %}
+                                <input uid="{{ course.teaching_program__course__course_name }}|{{ course.teaching_program__teacher__name }}|{{ course.room__room_name }}|{{ course.teaching_program__the_start_week }}|{{ course.teaching_program__the_end_week }}|{{ course.time__day }}|{{ course.time__lesson }}"
+                                       class="btn btn-danger btn-xs btn-delete"
+                                       type="button" value="删除">
+                            {% else %}
+                                <input uid="{{ course.teaching_program__course__course_name }}|{{ course.teaching_program__teacher__name }}|{{ course.room__room_name }}|{{ course.teaching_program__exp_start_week }}|{{ course.teaching_program__exp_end_week }}|{{ course.time__day }}|{{ course.time__lesson }}"
+                                       class="btn btn-danger btn-xs btn-delete"
+                                       type="button" value="删除">
+                            {% endif %}
+
+                        </td>
+                    </tr>
+                {% endfor %}
+
+                </tbody>
+            </table>
+        </div>
+        <ul class="pagination">
+            {{ page_string }}
+        </ul>
+    </div>
+
+    <!-- 删除(对话框) -->
+    <div class="modal fade" id="deleteModal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel">
+        <div class="modal-dialog" role="document">
+            <div class="alert alert-danger alert-dismissible fade in" role="alert">
+                <h4>是否确认删除？</h4>
+                <p style="margin: 10px 0;">删除后，所有关联的数据也会一并删除，无法复原。</p>
+                <p style="text-align: right;">
+                    <button id="btnConfirmDelete" type="button" class="btn btn-danger">删 除</button>
+                    <button type="button" class="btn btn-default" data-dismiss="modal">不，再想想</button>
+                </p>
+            </div>
+        </div>
+    </div>
+{% endblock %}
+
+{% block js %}
+    <script type="text/javascript">
+        let DELETE_ID;
+        $(function () {
+            bindBtnDeleteEvent();
+            bindBtnConfirmDeleteEvent();
+        })
+
+        function bindBtnDeleteEvent() {
+            $(".btn-delete").click(function () {
+                $("#deleteModal").modal('show');
+                DELETE_ID = $(this).attr("uid");
+            });
+        }
+
+        function bindBtnConfirmDeleteEvent() {
+            $("#btnConfirmDelete").click(function () {
+                $.ajax({
+                    url: "/course/delete/",
+                    type: "GET",
+                    data: {
+                        uid: DELETE_ID,
+                    },
+                    dataType: "JSON",
+                    success: function (res) {
+                        if (res.status) {
+                            $("#deleteModal").modal('hide');
+                            DELETE_ID = 0;
+                            location.reload();
+                        }
+
+                    }
+                })
+            });
+        }
+    </script>
+{% endblock %}

@@ -1,0 +1,48 @@
+{% extends 'manager_layout.html' %}
+{% load static %}
+
+{% block css %}
+    <link rel="stylesheet" href="{% static 'plugins/bootstrap-datepicker-master/css/bootstrap-datepicker.css' %}">
+{% endblock %}
+
+{% block content %}
+    <div class="container">
+        <div class="panel panel-default">
+            <div class="panel-heading">
+                <h3 class="panel-title"><strong>添加课程安排</strong></h3>
+            </div>
+            <div class="panel-body">
+                <form method="post" novalidate>
+                    {% csrf_token %}
+
+                    {% for field in courseForm %}
+                        <div class="form-group">
+                            <label>{{ field.label }}</label>
+                            {{ field }}
+                            <span style="color: red;">{{ field.errors.0 }}</span>
+                        </div>
+                    {% endfor %}
+
+
+                    <button type="submit" class="btn btn-primary"> 提交</button>
+                </form>
+            </div>
+        </div>
+    </div>
+{% endblock %}
+
+{% block js %}
+    <script src="{% static 'plugins/bootstrap-datepicker-master/js/bootstrap-datepicker.js' %}"></script>
+    <script src="{% static 'plugins/bootstrap-datepicker-master/locales/bootstrap-datepicker.zh-CN.min.js' %}"></script>
+
+    <script>
+        $(function () {
+            $('#id_born_date, #id_enrollment_date').datepicker({
+                format: 'yyyy-mm-dd',
+                language: "zh-CN",
+                todayHighlight: true,
+                autoclose: true
+            });
+        })
+    </script>
+{% endblock %}

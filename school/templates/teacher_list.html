@@ -1,0 +1,119 @@
+{% extends 'manager_layout.html' %}
+
+{% block content %}
+    <div class="container">
+        <div style="margin-bottom: 10px">
+            <a class="btn btn-success" href="/teach/add/">
+                <span class="glyphicon glyphicon-plus-sign" aria-hidden="true"></span>
+                添加教师
+            </a>
+
+            <div style="float: right;width: 300px;">
+                <form method="get">
+                    <div class="input-group">
+                        <input type="text" name="value" class="form-control" placeholder="请输入工号 / 姓名..."
+                               value={{ value }}>
+                        <span class="input-group-btn">
+                        <button class="btn btn-default" type="submit">
+                            <span class="glyphicon glyphicon-search" aria-hidden="true"></span>
+                        </button>
+                      </span>
+                    </div>
+                </form>
+            </div>
+
+        </div>
+
+        <div class="panel panel-default">
+            <!-- Default panel contents -->
+            <div class="panel-heading">
+                <span class="glyphicon glyphicon-th-list" aria-hidden="true"></span>
+                教师列表
+            </div>
+            <!-- Table -->
+            <table class="table table-striped table-bordered">
+                <thead>
+                <tr>
+                    <th>工号</th>
+                    <th>姓名</th>
+                    <th>性别</th>
+                    <th>系</th>
+                    <th>职称</th>
+                    <th>操作</th>
+                </tr>
+                </thead>
+                <tbody>
+                {% for teacher in teachers %}
+                    <tr>
+                        <th>{{ teacher.user.username }}</th>
+                        <td>{{ teacher.name }}</td>
+                        <td>{{ teacher.get_gender_display }}</td>
+                        <td>{{ teacher.department_name }}</td>
+                        <td>{{ teacher.get_title_display }}</td>
+                        <td>
+                            <a class="btn btn-primary btn-xs" href="/teach/{{ teacher.user.username }}/edit/">编辑</a>
+                            <input uid="{{ teacher.user.username }}" class="btn btn-danger btn-xs btn-delete" type="button" value="删除">
+                        </td>
+                    </tr>
+                {% endfor %}
+
+                </tbody>
+            </table>
+        </div>
+        <ul class="pagination">
+            {{ page_string }}
+        </ul>
+    </div>
+
+    <!-- 删除(对话框) -->
+    <div class="modal fade" id="deleteModal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel">
+        <div class="modal-dialog" role="document">
+            <div class="alert alert-danger alert-dismissible fade in" role="alert">
+                <h4>是否确认删除？</h4>
+                <p style="margin: 10px 0;">删除后，所有关联的数据也会一并删除，无法复原。</p>
+                <p style="text-align: right;">
+                    <button id="btnConfirmDelete" type="button" class="btn btn-danger">删 除</button>
+                    <button type="button" class="btn btn-default" data-dismiss="modal">不，再想想</button>
+                </p>
+            </div>
+        </div>
+    </div>
+{% endblock %}
+
+{% block js %}
+    <script type="text/javascript">
+        let DELETE_ID;
+        $(function () {
+            bindBtnDeleteEvent();
+            bindBtnConfirmDeleteEvent();
+        })
+
+        function bindBtnDeleteEvent() {
+            $(".btn-delete").click(function () {
+                $("#deleteModal").modal('show');
+                DELETE_ID = $(this).attr("uid");
+            });
+        }
+
+        function bindBtnConfirmDeleteEvent(){
+            $("#btnConfirmDelete").click(function () {
+                $.ajax({
+                    url: "/teach/delete/",
+                    type: "GET",
+                    data: {
+                      uid: DELETE_ID,
+                    },
+                    dataType: "JSON",
+                    success: function (res) {
+                        if(res.status) {
+                            $("#deleteModal").modal('hide');
+                            DELETE_ID = 0;
+                            location.reload();
+                        }
+
+                    }
+                })
+            });
+        }
+    </script>
+{% endblock %}

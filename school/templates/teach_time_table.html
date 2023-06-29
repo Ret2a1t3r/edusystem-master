@@ -1,0 +1,76 @@
+{% extends 'teacher_layout.html' %}
+
+{% block content %}
+    <div class="container">
+        <div style="margin-bottom: 10px">
+
+            <div style="float: right;width: 300px;">
+                <form method="get">
+                    <div class="input-group">
+                        <input type="text" name="value" class="form-control" placeholder="请输入课程名 ..."
+                               value={{ value }}>
+                        <span class="input-group-btn">
+                        <button class="btn btn-default" type="submit">
+                            <span class="glyphicon glyphicon-search" aria-hidden="true"></span>
+                        </button>
+                      </span>
+                    </div>
+                </form>
+            </div>
+
+        </div>
+
+        <div class="panel panel-default" style="margin-top: 45px;">
+            <!-- Default panel contents -->
+            <div class="panel-heading">
+                <span class="glyphicon glyphicon-th-list" aria-hidden="true"></span>
+                课程安排列表
+            </div>
+            <!-- Table -->
+            <table class="table table-striped table-bordered">
+                <thead>
+                <tr>
+                    <th>课程名</th>
+                    <th>上课地点</th>
+                    <th>上课时间</th>
+                    <th>上课班级</th>
+                    <th>操作</th>
+                </tr>
+                </thead>
+                <tbody>
+                {% for key,course in courses.items %}
+                    <tr>
+                        <th>{{ course.course }}</th>
+                        <td>{{ course.room_name }}</td>
+                        <td>{{ course.time }}</td>
+                        <td>{{ course.classes }}</td>
+                        <td>
+                            <a class="btn btn-info btn-xs" href="/stu/{{ course.teaching_program_id }}/list2">查看学生</a>
+                            <a class="btn btn-primary btn-xs"
+                               href="/score/{{ course.teaching_program_id }}/record">录入成绩</a>
+                        </td>
+                    </tr>
+                {% endfor %}
+
+                </tbody>
+            </table>
+        </div>
+        <ul class="pagination">
+            {{ page_string }}
+        </ul>
+    </div>
+
+    <!-- 删除(对话框) -->
+    <div class="modal fade" id="deleteModal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel">
+        <div class="modal-dialog" role="document">
+            <div class="alert alert-danger alert-dismissible fade in" role="alert">
+                <h4>是否确认删除？</h4>
+                <p style="margin: 10px 0;">删除后，所有关联的数据也会一并删除，无法复原。</p>
+                <p style="text-align: right;">
+                    <button id="btnConfirmDelete" type="button" class="btn btn-danger">删 除</button>
+                    <button type="button" class="btn btn-default" data-dismiss="modal">不，再想想</button>
+                </p>
+            </div>
+        </div>
+    </div>
+{% endblock %}

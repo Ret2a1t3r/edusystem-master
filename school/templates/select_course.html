@@ -1,0 +1,116 @@
+{% extends 'student_layout.html' %}
+
+{% block content %}
+    <div class="container">
+        <div style="margin-bottom: 10px">
+            <div style="float: right;width: 300px;">
+                <form method="get">
+                    <div class="input-group">
+                        <input type="text" name="value" class="form-control" placeholder="请输入课程名 / 教师名..."
+                               value={{ value }}>
+                        <span class="input-group-btn">
+                        <button class="btn btn-default" type="submit">
+                            <span class="glyphicon glyphicon-search" aria-hidden="true"></span>
+                        </button>
+                      </span>
+                    </div>
+                </form>
+            </div>
+
+        </div>
+
+        <div class="panel panel-default" style="margin-top: 45px;">
+            <!-- Default panel contents -->
+            <div class="panel-heading">
+                <span class="glyphicon glyphicon-th-list" aria-hidden="true"></span>
+                可选课程列表
+            </div>
+            <!-- Table -->
+            <table class="table table-striped table-bordered">
+                <thead>
+                <tr>
+                    <th>课程名</th>
+                    <th>学分</th>
+                    <th>上课教师</th>
+                    <th>上课地点</th>
+                    <th>上课时间</th>
+                    <th>操作</th>
+                </tr>
+                </thead>
+                <tbody>
+                    {% for key, course in courses.items %}
+
+                        <tr>
+                            <th>{{ course.course }}</th>
+                            <td>{{ course.score }}</td>
+                            <td>{{ course.teacher_name }}</td>
+                            <td>{{ course.room_name }}</td>
+                            <td>{{ course.time }}</td>
+                            <td>
+                                <input uid="{{ course.course }}|{{ course.teacher_name }}"
+                                       class="btn btn-success btn-xs btn-submit"
+                                       type="button" value="选课">
+                            </td>
+                        </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+        <ul class="pagination">
+            {{ page_string }}
+        </ul>
+    </div>
+
+    <!-- 删除(对话框) -->
+    <div class="modal fade" id="deleteModal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel">
+        <div class="modal-dialog" role="document">
+            <div class="alert alert-danger alert-dismissible fade in" role="alert">
+                <h4>是否确认选择？</h4>
+                <p style="margin: 10px 0;">请谨慎选课。</p>
+                <p style="text-align: right;">
+                    <button id="btnConfirmDelete" type="button" class="btn btn-danger">选 择</button>
+                    <button type="button" class="btn btn-default" data-dismiss="modal">不，再想想</button>
+                </p>
+            </div>
+        </div>
+    </div>
+{% endblock %}
+
+{% block js %}
+<script type="text/javascript">
+        let DELETE_ID;
+        $(function () {
+            bindBtnDeleteEvent();
+            bindBtnConfirmDeleteEvent();
+        })
+
+        function bindBtnDeleteEvent() {
+            $(".btn-submit").click(function () {
+                $("#deleteModal").modal('show');
+                DELETE_ID = $(this).attr("uid");
+            });
+        }
+
+        function bindBtnConfirmDeleteEvent(){
+            $("#btnConfirmDelete").click(function () {
+                console.log("sadasd")
+                $.ajax({
+                    url: "/select/course/",
+                    type: "POST",
+                    data: {
+                      uid: DELETE_ID,
+                    },
+                    dataType: "JSON",
+                    success: function (res) {
+                        if(res.status) {
+                            $("#deleteModal").modal('hide');
+                            DELETE_ID = 0;
+                            location.reload();
+                        }
+
+                    }
+                })
+            });
+        }
+    </script>
+{% endblock %}

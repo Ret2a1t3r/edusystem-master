@@ -1,0 +1,119 @@
+{% extends 'teacher_layout.html' %}
+
+{% block content %}
+    <div class="container">
+        <div style="margin-bottom: 10px">
+
+            <div style="float: right;width: 300px;">
+                <form method="get">
+                    <div class="input-group">
+                        <input type="text" name="value" class="form-control" placeholder="请输入学号 / 姓名..."
+                               value={{ value }}>
+                        <span class="input-group-btn">
+                        <button class="btn btn-default" type="submit">
+                            <span class="glyphicon glyphicon-search" aria-hidden="true"></span>
+                        </button>
+                      </span>
+                    </div>
+                </form>
+            </div>
+
+        </div>
+
+        <div class="panel panel-default">
+            <!-- Default panel contents -->
+            <div class="panel-heading">
+                <span class="glyphicon glyphicon-th-list" aria-hidden="true"></span>
+                学生列表
+            </div>
+            <!-- Table -->
+            <table class="table table-striped table-bordered">
+                <thead>
+                <tr>
+                    <th>学号</th>
+                    <th>姓名</th>
+                    <th>性别</th>
+                    <th>系</th>
+                    <th>专业</th>
+                    <th>班级</th>
+                    <th>成绩</th>
+                </tr>
+                </thead>
+                <tbody>
+                {% for student in students %}
+                    <tr>
+                        <th>{{ student.user__username }}</th>
+                        <td>{{ student.name }}</td>
+                        {% if student.gender == 1 %}
+                            <td>男</td>
+                        {% else %}
+                            <td>女</td>
+                        {% endif %}
+                        <td>{{ student.department_name }}</td>
+                        <td>{{ student.major_name }}</td>
+                        <td>{{ student.class_name }}</td>
+                        <td>{{ student.selectcourse__grade }}</td>
+
+                    </tr>
+                {% endfor %}
+
+                </tbody>
+            </table>
+        </div>
+        <ul class="pagination">
+            {{ page_string }}
+        </ul>
+    </div>
+
+    <!-- 删除(对话框) -->
+    <div class="modal fade" id="deleteModal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel">
+        <div class="modal-dialog" role="document">
+            <div class="alert alert-danger alert-dismissible fade in" role="alert">
+                <h4>是否确认删除？</h4>
+                <p style="margin: 10px 0;">删除后，所有关联的数据也会一并删除，无法复原。</p>
+                <p style="text-align: right;">
+                    <button id="btnConfirmDelete" type="button" class="btn btn-danger">删 除</button>
+                    <button type="button" class="btn btn-default" data-dismiss="modal">不，再想想</button>
+                </p>
+            </div>
+        </div>
+    </div>
+{% endblock %}
+
+{% block js %}
+    <script type="text/javascript">
+        let DELETE_ID;
+        $(function () {
+            bindBtnDeleteEvent();
+            bindBtnConfirmDeleteEvent();
+        })
+
+        function bindBtnDeleteEvent() {
+            $(".btn-delete").click(function () {
+                $("#deleteModal").modal('show');
+                DELETE_ID = $(this).attr("uid");
+            });
+        }
+
+        function bindBtnConfirmDeleteEvent() {
+            $("#btnConfirmDelete").click(function () {
+                $.ajax({
+                    url: "/stu/delete/",
+                    type: "GET",
+                    data: {
+                        uid: DELETE_ID,
+                    },
+                    dataType: "JSON",
+                    success: function (res) {
+                        if (res.status) {
+                            $("#deleteModal").modal('hide');
+                            DELETE_ID = 0;
+                            location.reload();
+                        }
+
+                    }
+                })
+            });
+        }
+    </script>
+{% endblock %}
